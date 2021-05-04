@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:location/location.dart';
 import 'package:logger/logger.dart';
 
+import 'lv_tab_bar_view.dart';
+
 class HomeController extends GetxController with SingleGetTickerProviderMixin {
   TabController tabController;
 
@@ -15,6 +17,8 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
   var location = Location();
 
   bool isLoading = true;
+
+  List<Widget> tabBarView = [];
 
   Future<void> listenForPermission() async {
     bool _serviceEnabled = await location.serviceEnabled();
@@ -59,6 +63,7 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
     super.onInit();
     listenForPermission();
     tabController = TabController(vsync: this, length: 3);
+    initTabBarView();
   }
 
   @override
@@ -69,26 +74,34 @@ class HomeController extends GetxController with SingleGetTickerProviderMixin {
 
   List<Clinic> clinicList = [];
 
-  Future<void> initTabBarView(int type) async {
+  Future<void> initTabBarView() async {
     _locationData = await location.getLocation();
-    if(_locationData!=0){
-      Logger().d('location2', _locationData);
-      var clinicListApi = await Service.getClinicList(
-          mID: 4,
-          lat: _locationData.latitude,
-          log: _locationData.longitude,
-          hot: false,
-          tinhTP: 0,
-          qH: 0,
-          dPho: '',
-          page: 1,
-          recod: 20,
-          find: '',
-          type: type);
-      clinicList = clinicListApi;
-      if (clinicList.length != 0) {
-        isLoading = false;
-        update();
+    // ignore: unrelated_type_equality_checks
+    if (_locationData != 0) {
+      for (int i = 1; i <= tabController.length; i++) {
+        var clinicListApi = await Service.getClinicList(
+            mID: 4,
+            lat: _locationData.latitude,
+            log: _locationData.longitude,
+            hot: false,
+            tinhTP: 0,
+            qH: 0,
+            dPho: '',
+            page: 1,
+            recod: 20,
+            find: '',
+            type: i);
+        Logger().d('clinicListApi', clinicListApi.length);
+        clinicList = clinicListApi;
+        if (clinicList.length != 0) {
+          tabBarView.add(listViewClinic(clinicList));
+          Logger().d('tabBarView', tabBarView.length);
+          if (tabBarView.length == tabController.length) {
+            Logger().d('tabBarView', tabBarView.length);
+            isLoading = false;
+            update();
+          }
+        }
       }
     }
   }

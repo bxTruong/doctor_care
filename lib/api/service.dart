@@ -1,4 +1,5 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+
 import 'package:doctor_care/model/clinic.dart';
 import 'package:logger/logger.dart';
 
@@ -18,9 +19,7 @@ class Service {
       String dPho,
       int page,
       int recod}) async {
-    final response = await Dio().get(
-        'http://api.izilife.vn/api/mobile/mobile.asmx/clinicList?mID=4&lat=21.024004599999998&log=105.79381839999999&hot=false&type=1&find=&tinhTP=0&qH=0&dPho=&page=1&recod=20');
-    /* final response = await Network().get(
+    final response = await Network().get(
       url: ApiConst.CLINIC_LIST,
       params: {
         'mID': mID,
@@ -35,25 +34,17 @@ class Service {
         'page': page,
         'recod': recod,
       },
-    );*/
+    );
     List<Clinic> clinicList = [];
-    Logger().e('statusCode', response.statusCode);
     if (response.statusCode == 200) {
-      var jsonRaw = response.data;
-      Logger().d(response.data);
-
-      /* List<dynamic> data = jsonRaw["data"];
-      print(data.length);
-
+      List<dynamic> data = jsonDecode(response.data)["data"];
       data.forEach((element) {
         clinicList.add(Clinic.fromJson(element));
-      });*/
+      });
       return clinicList;
     } else {
       Logger().e('statusCode', response.statusCode);
     }
     return null;
   }
-
-
 }

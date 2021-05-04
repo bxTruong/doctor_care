@@ -136,29 +136,47 @@ Widget tabBar(HomeController homeController) {
 }
 
 Widget tabBarView(HomeController homeController) {
+  return GetBuilder(
+    init: HomeController(),
+    builder: (homeController) {
+      if (homeController.isLoading) {
+        print(homeController.isLoading);
+        return Expanded(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } else {
+        return Expanded(
+          child: TabBarView(
+            controller: homeController.tabController,
+            children: homeController.tabBarView,
+          ),
+        );
+      }
+    },
+  );
   return Expanded(
     child: TabBarView(
       controller: homeController.tabController,
-      children: [
-        pediatricClinic(homeController),
-        pediatricClinic(homeController),
-        pediatricClinic(homeController),
-        /*gynecologicalClinic(homeController),
-        reputableClinic(homeController)*/
-      ],
+      children: homeController.tabBarView,
     ),
   );
 }
 
-Widget pediatricClinic(HomeController homeController) {
-  homeController.initTabBarView(1);
-  if (homeController.isLoading) {
-    return Center(
-      child: CircularProgressIndicator(),
-    );
-  } else {
-    return listViewClinic(homeController.clinicList);
-  }
+Widget pediatricClinic() {
+  return GetBuilder(
+    init: HomeController(),
+    builder: (homeController) {
+      if (homeController.isLoading) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      } else {
+        return listViewClinic(homeController.clinicList);
+      }
+    },
+  );
 }
 
 /*gynecologicalClinic(HomeController homeController) {
